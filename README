@@ -1,0 +1,20 @@
+# ExtIO_LimeSDR
+
+This repository contains HDSDR ExtIO plugin for LimeSDR-USB and LimeSDR-mini boards.
+
+## Prebuilt library
+
+You can download prebuilt library by fallowing this link:
+* TO BE DONE  
+
+## Documentation
+
+Find build and install instructions for this plugin by following this link:
+
+* /HDSDR_ExtIO_Plugin_User_Guide.pdf
+
+## Help and support
+
+The discourse forum is a good way to find help and discuss topics:
+
+* https://discourse.myriadrf.org/
