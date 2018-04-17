@@ -11,7 +11,7 @@ You can download prebuilt library by fallowing this link:
 
 Find build and install instructions for this plugin by following this link:
 
-* /HDSDR_ExtIO_Plugin_User_Guide.pdf
+https://wiki.myriadrf.org/LimeSDR_ExtIO_Plugin_for_HDSDR
 
 ## Help and support
 
