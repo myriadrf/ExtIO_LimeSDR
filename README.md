@@ -5,7 +5,8 @@ This repository contains HDSDR ExtIO plugin for LimeSDR-USB and LimeSDR-mini boa
 ## Prebuilt library
 
 You can download prebuilt library by fallowing this link:
-* TO BE DONE  
+
+http://downloads.myriadrf.org/project/limesuite/18.04/ExtIO_LimeSDR_1.05.dll
 
 ## Documentation
 
