@@ -99,7 +99,7 @@ int numOfChannels = 0;
 size_t channel = 0;
 size_t oversample = 2;
 int sr_idx = 1;
-int ant_select = LMS_PATH_LNAH;
+int ant_select = LMS_PATH_AUTO;
 int64_t CurrentLOfreq = 28.5e6;     // default HDSDR LO freq
 float_type LPFbandwidth = sampleRates[sr_idx];
 float_type CalibrationBandwidth = sampleRates[sr_idx];
@@ -129,8 +129,9 @@ static void error(int lvl, const char *msg)
 #else
     if (error_enabled && lvl < 2)
     {
-        if(lvl == 0)
+        if (lvl == 1) {
             ExtIOCallback(-1, extHw_Stop, 0, NULL);
+        }
         DbgPrintf(msg);
     }
 #endif
@@ -157,28 +158,12 @@ static void PerformCalibration(bool enable_error)
         StopHW();
     }
     error_enabled = enable_error;
-    if (DeviceInfo[currentDeviceIndex][0] == "LimeSDR Mini") {
 
-        /* Switch LNA RF path for better calibration results */
-        uint16_t value = 0;
-        LMS_ReadFPGAReg(device, 0x17, &value);
-        value ^= (1 << 8 | 1 << 9);
-        LMS_WriteFPGAReg(device, 0x17, value);
-
-        isCalibrated = Calibrated;
-        if (LMS_Calibrate(device, LMS_CH_RX, channel, CalibrationBandwidth, 0) != 0) {
-            isCalibrated = CalibrationErr;
-        }
-
-        value ^= (1 << 8 | 1 << 9);
-        LMS_WriteFPGAReg(device, 0x17, value);
+    isCalibrated = Calibrated;
+    if (LMS_Calibrate(device, LMS_CH_RX, channel, CalibrationBandwidth, 0) != 0) {
+        isCalibrated = CalibrationErr;
     }
-    else {
-        isCalibrated = Calibrated;
-        if (LMS_Calibrate(device, LMS_CH_RX, channel, CalibrationBandwidth, 0) != 0) {
-            isCalibrated = CalibrationErr;
-        }
-    }
+    
     error_enabled = true;
     if (freq != -1)
         StartHW64(freq);
@@ -369,12 +354,20 @@ static INT_PTR CALLBACK MainDlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
 
         /* Add antenna choices */
         if (DeviceInfo[currentDeviceIndex][0] == "LimeSDR Mini") {
+            ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "Auto");
+            ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 0, 255);
             ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "LNA_H");
-            ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 0, 1);
+            ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 1, 1);
             ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "LNA_W");
-            ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 1, 3);
-        }
-        else {
+            ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 2, 3);
+        } else if (DeviceInfo[currentDeviceIndex][0] == "LimeNET-Micro") {
+            ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "Auto");
+            ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 0, 255);
+            ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "LNA_H");
+            ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 1, 1);
+            ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "LNA_L");
+            ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 2, 2);
+        } else {
             ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "LNA_H");
             ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 0, 1);
             ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "LNA_L");
@@ -547,7 +540,7 @@ static INT_PTR CALLBACK MainDlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                     TIA = 3;
                     PGA = 16;
 
-                    LPFenable = false;
+                    LPFenable = true;
                     LPFbandwidth = sampleRates[sr_idx];
                     CalibrationBandwidth = sampleRates[sr_idx];
 
@@ -568,10 +561,20 @@ static INT_PTR CALLBACK MainDlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
 
                     /* Add antenna choices */
                     if (DeviceInfo[currentDeviceIndex][0] == "LimeSDR Mini") {
+                        ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "Auto");
+                        ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 0, 255);
                         ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "LNA_H");
-                        ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 0, 1);
+                        ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 1, 1);
                         ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "LNA_W");
-                        ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 1, 3);
+                        ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 2, 3);
+                    }
+                    else if (DeviceInfo[currentDeviceIndex][0] == "LimeNET-Micro") {
+                        ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "Auto");
+                        ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 0, 255);
+                        ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "LNA_H");
+                        ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 1, 1);
+                        ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "LNA_L");
+                        ComboBox_SetItemData(GetDlgItem(hwndDlg, IDC_COMBO_ANT), 2, 2);
                     }
                     else {
                         ComboBox_AddString(GetDlgItem(hwndDlg, IDC_COMBO_ANT), "LNA_H");
@@ -724,12 +727,12 @@ static INT_PTR CALLBACK MainDlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPAR
                 }
 
                 /* Default settings */
-                LPFenable = false;
+                LPFenable = true;
                 channel = 0;
                 sr_idx = 1;
                 LPFbandwidth = sampleRates[sr_idx];
                 CalibrationBandwidth = LPFbandwidth;
-                ant_select = LMS_PATH_LNAH;
+                ant_select = LMS_PATH_AUTO;
 
                 LNA = 10;
                 TIA = 3;
@@ -828,12 +831,12 @@ bool __declspec(dllexport) __stdcall InitHW(char *name, char *model, int& type)
 
     /* If device was changed, reset settings to default */
     if (strcmp(lastUsedDeviceName, DeviceInfo[currentDeviceIndex][0].c_str()) != 0) {
-        LPFenable = false;
+        LPFenable = true;
         sr_idx = 1;
         LPFbandwidth = sampleRates[sr_idx];
         CalibrationBandwidth = LPFbandwidth;
         channel = 0;
-        ant_select = LMS_PATH_LNAH;
+        ant_select = LMS_PATH_AUTO;
         LNA = 10;
         TIA = 3;
         PGA = 16;
