@@ -29,6 +29,8 @@ THE SOFTWARE
 
 #include "LC_ExtIO_Types.h"
 
+#define ExtIO_LimeSDR_VERSION @ExtIO_LimeSDR_VERSION@
+
 extern "C" bool EXTIO_API InitHW(char *name, char *model, int& type);
 extern "C" int EXTIO_API StartHW64(int64_t freq);
 extern "C" bool EXTIO_API OpenHW(void);

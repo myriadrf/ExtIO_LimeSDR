@@ -36,3 +36,4 @@
 /Debug/*
 /ExtIO_LimeSDR/Release/*
 /ExtIO_LimeSDR/Debug/*
+/.vs/*
