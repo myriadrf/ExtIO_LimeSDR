@@ -293,7 +293,7 @@ void UpdateDialog()
     ComboBox_SetCurSel(GetDlgItem(h_dialog, IDC_COMBO_CHAN), channel);  // Channel dropdown
     ComboBox_SetCurSel(GetDlgItem(h_dialog, IDC_COMBO_DEVICE), currentDeviceIndex);// Device dropdown
 
-                                                                                   /* Set antenna selection */
+    /* Set antenna selection */
     for (int i = 0; i < ComboBox_GetCount(GetDlgItem(h_dialog, IDC_COMBO_ANT)); i++)
         if (ComboBox_GetItemData(GetDlgItem(h_dialog, IDC_COMBO_ANT), i) == ant_select)
             ComboBox_SetCurSel(GetDlgItem(h_dialog, IDC_COMBO_ANT), i);
@@ -836,7 +836,10 @@ bool __declspec(dllexport) __stdcall InitHW(char *name, char *model, int& type)
         LPFbandwidth = sampleRates[sr_idx];
         CalibrationBandwidth = LPFbandwidth;
         channel = 0;
-        ant_select = LMS_PATH_AUTO;
+        if (DeviceInfo[currentDeviceIndex][0] == "LimeSDR-USB")
+            ant_select = LMS_PATH_LNAH;
+        else
+            ant_select = LMS_PATH_AUTO;
         LNA = 10;
         TIA = 3;
         PGA = 16;
