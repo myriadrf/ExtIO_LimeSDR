@@ -27,7 +27,7 @@ THE SOFTWARE
 #define EXTIO_EXPORTS		1
 #define HWNAME				"ExtIO_Lime"
 #define HWMODEL				"ExtIO_Lime"
-#define VERNUM              "1.06"
+#define VERNUM              "1.07"
 #define EXT_BLOCKLEN		4096			/* only multiples of 512 */
 //---------------------------------------------------------------------------
 #include "ExtIO_LimeSDR.h"
